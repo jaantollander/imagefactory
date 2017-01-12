@@ -26,6 +26,7 @@ memory images or saved in to the filesystem.
 Examples
 --------
 Jpeg
+
 .. image:: docs/images/untitled.jpeg
    :target: docs/images/untitled.jpeg
    :alt: example.jpeg
