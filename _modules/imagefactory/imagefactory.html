@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>imagefactory.imagefactory &mdash; ImageFactory 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="ImageFactory 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ImageFactory
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">ImageFactory</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>imagefactory.imagefactory</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for imagefactory.imagefactory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">StringIO</span><span class="p">,</span> <span class="n">TextIOBase</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># FIXME: Text size</span>
+<span class="c1"># TODO: Caching?</span>
+<span class="c1"># TODO: Image size choises: Icon, ...</span>
+<span class="c1"># TODO: Width and height units (cm, mm, em, px, pt, pc, in, ...) default: px</span>
+<span class="c1"># TODO: Background color</span>
+
+
+<span class="k">def</span> <span class="nf">_create_bitmap</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create bitmap image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        BytesIO:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">filetype</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;RGBA&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">))</span>
+    <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">draw</span><span class="o">.</span><span class="n">textsize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">(((</span><span class="n">width</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">height</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file</span>
+
+
+<span class="k">def</span> <span class="nf">_create_svg</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create svg image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StringIO:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">svgwrite</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.svg&#39;</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">svgwrite</span><span class="o">.</span><span class="n">Drawing</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;tiny&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                             <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="n">insert</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">))</span>
+    <span class="c1"># TODO: Test if text fits inside rectangle</span>
+    <span class="c1"># image.add(image.text(text, insert=center))</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file</span>
+
+
+<span class="k">def</span> <span class="nf">_save_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">filedir</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save in memory image to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (io.IOBase):</span>
+<span class="sd">            In memory image.</span>
+
+<span class="sd">        filedir (str):</span>
+<span class="sd">            Path to the directory where `image` should be saved</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If `image` is not correct type.</span>
+<span class="sd">        FileExistsError: If file with name `image.name` exists in `filedir`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="c1"># Write as text file</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;wt&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Write as binary file</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;wb&#39;</span>
+
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
+            <span class="s1">&#39;File with name &quot;</span><span class="si">{name}</span><span class="s1">&quot; already exists in path &quot;</span><span class="si">{filepath}</span><span class="s1">&quot;.&#39;</span>
+            <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_image"><a class="viewcode-back" href="../../introduction.html#imagefactory.imagefactory.create_image">[docs]</a><span class="k">def</span> <span class="nf">create_image</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;untitled&#39;</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+                 <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates in memory images for testing [#]_. Bitmap images are created</span>
+
+<span class="sd">    &gt;&gt;&gt; from imagefactory import create_image</span>
+<span class="sd">    &gt;&gt;&gt; create_image()</span>
+<span class="sd">    &lt;_io.BytesIO object at ...&gt;</span>
+
+<span class="sd">    Vector graphic images can be created</span>
+
+<span class="sd">    &gt;&gt;&gt; from imagefactory import create_image</span>
+<span class="sd">    &gt;&gt;&gt; create_image(filetype=&#39;svg&#39;)</span>
+<span class="sd">    &lt;_io.StringIO object at ...&gt;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str):</span>
+<span class="sd">            - ``name`` Name of the file.</span>
+<span class="sd">            - ``name.ext`` If extension is supplied it overwrites any supplied</span>
+<span class="sd">              filetype.</span>
+
+<span class="sd">        width (int):</span>
+<span class="sd">            Positive integer</span>
+
+<span class="sd">        height (int):</span>
+<span class="sd">            Positive integer</span>
+
+<span class="sd">        filetype (str):</span>
+<span class="sd">            Filetype is extension string: ``jpeg, png, gif, svg``</span>
+
+<span class="sd">        text (str, optional):</span>
+<span class="sd">            - Default:  ``None`` uses ``{width}x{height}``</span>
+<span class="sd">            - Otherwise supplied ``text`` string is used.</span>
+
+<span class="sd">        savedir (str, optional):</span>
+<span class="sd">            - Default: ``None`` doesn&#39;t save the image</span>
+<span class="sd">            - Otherwise save image to ``savedir`` directory</span>
+
+<span class="sd">        overwrite (Boolean):</span>
+<span class="sd">            Boolean flag for toggling if existing file in the same filepath</span>
+<span class="sd">            should be overwritten.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        BytesIO|StringIO:</span>
+<span class="sd">            Image as ``BytesIO`` or ``StringIO`` object. It can be used in same fashion</span>
+<span class="sd">            as file object created by opening a file.</span>
+
+<span class="sd">    References:</span>
+
+<span class="sd">        .. [#] http://wildfish.com/blog/2014/02/27/generating-in-memory-image-for-tests-python/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="p">:</span>
+        <span class="n">filetype</span> <span class="o">=</span> <span class="n">ext</span>
+
+    <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{width}</span><span class="s2">x</span><span class="si">{height}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s1">&#39;svg&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">_create_svg</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;You need to install svgwrite to create vector graphics.&#39;</span>
+                <span class="s1">&#39;</span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">_create_bitmap</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">savedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_save_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">savedir</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">image</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Jaan Tollander de Balsch.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
