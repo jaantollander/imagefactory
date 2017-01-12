@@ -12,6 +12,10 @@ env:
 #  - TOXENV=py26
 #  - TOXENV=pypy
 
+branches:
+    only:
+        - master
+
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: pip install -U tox
 
@@ -20,6 +24,7 @@ script: tox -e ${TOXENV}
 
 # After you create the Github repo and add it to Travis, run the
 # travis_pypi_setup.py script to finish PyPI deployment setup
+# TODO: make docs and push to gh-pages
 
 #deploy:
 #  provider: pypi
