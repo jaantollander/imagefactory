@@ -1,4 +1,4 @@
-ImageFactory
+Introduction
 ============
 
 .. image:: https://img.shields.io/pypi/v/imagefactory.svg
@@ -20,6 +20,32 @@ Python package for creating test images. Test images can be created as in
 memory images or saved in to the filesystem. Package is released under MIT
 license.
 
-Checkout the documentation for installation, examples and API.
+Examples
+--------
 
-https://jaantollander.github.io/imagefactory/
+Examples of the images created by the package.
+
+.. list-table::
+   :header-rows: 1
+
+   * - jpeg
+     - png
+     - svg
+
+   * - .. image:: _images/untitled.jpeg
+          :target: _images/untitled.jpeg
+          :alt: example.jpeg
+
+     - .. image:: _images/untitled.png
+          :target: _images/untitled.png
+          :alt: example png
+
+     - .. image:: _images/untitled.svg
+          :target: _images/untitled.svg
+          :alt: example svg
+
+Basic Usage
+-----------
+Currently there is only one function ``create_image``.
+
+.. autofunction:: imagefactory.imagefactory.create_image

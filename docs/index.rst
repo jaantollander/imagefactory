@@ -4,8 +4,6 @@ Welcome to ImageFactory's documentation!
 .. toctree::
    :maxdepth: 2
 
-   readme
+   introduction
    installation
-   usage
    contributing
-   authorshistory
