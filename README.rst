@@ -20,7 +20,9 @@ Python package for creating test images. Test images can be created as in
 memory images or saved in to the filesystem.
 
 * Free software: MIT license
-* Documentation: https://imagefactory.readthedocs.io.
+
+..
+    * Documentation: https://imagefactory.readthedocs.io.
 
 
 Examples
