@@ -93,7 +93,8 @@ def create_image(name='untitled', width=48, height=48, filetype='png',
 
     Args:
         name (str):
-            Name without file extension.
+            Name of the file. If extension is supplied it overwrites any
+            supplied filetype.
 
         width (int):
             Positive integer
@@ -124,6 +125,9 @@ def create_image(name='untitled', width=48, height=48, filetype='png',
     .. [#] https://svgwrite.readthedocs.io/en/latest/overview.html
     """
     logging.info("")
+    name, ext = os.path.splitext(name)
+    if ext:
+        filetype = ext
 
     if text is None:
         text = "{width}x{height}".format(width=width, height=height)
