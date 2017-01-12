@@ -3,62 +3,60 @@
 """
 Tests
 """
-import os
-import shutil
 import string
+import tempfile
 from io import BytesIO, StringIO
 
 import hypothesis.strategies as st
+import pytest
 from hypothesis import given, settings
 
 from imagefactory.imagefactory import create_image
 
-# TODO: BASE_DIR
-SAVE_IMAGES = False
-IMAGES_FOLDER = ".test_images"
-
 BITMAP = ('jpeg', 'png', 'gif')
 SVG = ('svg',)
-
-# Directory for saving images
-if SAVE_IMAGES:
-    if os.path.exists(IMAGES_FOLDER):
-        shutil.rmtree(IMAGES_FOLDER)
-    os.makedirs(IMAGES_FOLDER)
-
-
-def save_image(image):
-    """
-
-    Args:
-        image (BytesIO|StringIO):
-    """
-    if isinstance(image, BytesIO):
-        mode = 'wb'
-    elif isinstance(image, StringIO):
-        mode = 'wt'
-    else:
-        raise Exception()
-    with open(os.path.join(IMAGES_FOLDER, image.name), mode) as file:
-        shutil.copyfileobj(image, file)
 
 
 @settings(max_examples=10)
 @given(
-    name=st.text(alphabet=string.ascii_letters, min_size=1, max_size=8),
+    name=st.text(string.ascii_letters, min_size=1, max_size=8),
     width=st.integers(min_value=1, max_value=1000),
     height=st.integers(min_value=1, max_value=1000),
     choice=st.choices(),
-    text=st.text(alphabet=string.ascii_letters, min_size=1, max_size=8) or
-         st.none()
+    text=st.text(string.ascii_letters, min_size=1, max_size=8) or st.none()
 )
-def test_create_image(name, width, height, choice, text):
-    # TODO: image size choices
-    filetype = choice(BITMAP + SVG)
+def test_create_bitmap(name, width, height, choice, text):
+    filetype = choice(BITMAP)
     image = create_image(name, width, height, filetype, text)
-    assert isinstance(image, (BytesIO, StringIO))
+    assert isinstance(image, BytesIO)
 
-    # Save images to file
-    if SAVE_IMAGES:
-        save_image(image)
 
+@settings(max_examples=10)
+@given(
+    name=st.text(string.ascii_letters, min_size=1, max_size=8),
+    width=st.integers(min_value=1, max_value=1000),
+    height=st.integers(min_value=1, max_value=1000),
+    text=st.text(string.ascii_letters, min_size=1, max_size=8) or st.none()
+)
+def test_create_svg(name, width, height, text):
+    filetype = 'svg'
+    image = create_image(name, width, height, filetype, text)
+    assert isinstance(image, StringIO)
+
+
+def test_create_bitmap_save():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        image = create_image(filetype='png', savedir=tmpdir)
+        assert isinstance(image, BytesIO)
+
+        with pytest.raises(FileExistsError):
+            create_image(filetype='png', savedir=tmpdir)
+
+
+def test_create_bitmap_svg():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        image = create_image(filetype='svg', savedir=tmpdir)
+        assert isinstance(image, StringIO)
+
+        with pytest.raises(FileExistsError):
+            create_image(filetype='svg', savedir=tmpdir)

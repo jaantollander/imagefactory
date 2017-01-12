@@ -2,13 +2,24 @@
 
 import click
 
+from imagefactory.imagefactory import create_image
+
+
+# TODO: confirm for overwriting file is exists
+# TODO: Verbosity
+
 
 @click.command()
-def main(args=None):
+@click.version_option()
+@click.option('--name', '-n', default='untitled')
+@click.option('--width', '-w', default=48)
+@click.option('--height', '-h', default=48)
+@click.option('--filetype', '-ft', default='png')
+@click.option('--text', '-t', default=None)
+@click.option('--savedir', '-d', default=None)
+def main(name, width, height, filetype, text, savedir):
     """Console script for imagefactory"""
-    click.echo("Replace this message by putting your code into "
-               "imagefactory.cli.main")
-    click.echo("See click documentation at http://click.pocoo.org/")
+    create_image(name, width, height, filetype, text, savedir)
 
 
 if __name__ == "__main__":

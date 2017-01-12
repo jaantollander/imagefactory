@@ -1,7 +1,5 @@
-===============================
 ImageFactory
-===============================
-
+============
 
 .. image:: https://img.shields.io/pypi/v/imagefactory.svg
         :target: https://pypi.python.org/pypi/imagefactory
@@ -18,20 +16,24 @@ ImageFactory
      :alt: Updates
 
 
-Python package for creating test images.
-
+Python package for creating test images. Test images can be created as in
+memory images or saved in to the filesystem.
 
 * Free software: MIT license
 * Documentation: https://imagefactory.readthedocs.io.
 
 
-Features
+Examples
 --------
+Bitmap
 
-* TODO
+
+
+Svg
+
 
 Credits
----------
+-------
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
