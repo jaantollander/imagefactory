@@ -11,7 +11,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
 
-from imagefactory.imagefactory import create_image
+from imagefactory import create_image
 
 BITMAP = ('jpeg', 'png', 'gif')
 SVG = ('svg',)
@@ -22,12 +22,12 @@ SVG = ('svg',)
     name=st.text(string.ascii_letters, min_size=1, max_size=8),
     width=st.integers(min_value=1, max_value=1000),
     height=st.integers(min_value=1, max_value=1000),
+    text=st.text(string.ascii_letters, min_size=1, max_size=8) or st.none(),
     choice=st.choices(),
-    text=st.text(string.ascii_letters, min_size=1, max_size=8) or st.none()
 )
-def test_create_bitmap(name, width, height, choice, text):
+def test_create_bitmap(name, width, height, text, choice):
     filetype = choice(BITMAP)
-    image = create_image(name, width, height, filetype, text)
+    image = create_image(name, filetype, width, height, text)
     assert isinstance(image, BytesIO)
 
 
@@ -40,7 +40,7 @@ def test_create_bitmap(name, width, height, choice, text):
 )
 def test_create_svg(name, width, height, text):
     filetype = 'svg'
-    image = create_image(name, width, height, filetype, text)
+    image = create_image(name, filetype, width, height, text)
     assert isinstance(image, StringIO)
 
 

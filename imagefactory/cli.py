@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+Commandline interface
+"""
 
 import click
 
-from imagefactory.imagefactory import create_image
+from imagefactory import create_image
 
 
 # TODO: confirm for overwriting file is exists
@@ -24,9 +27,11 @@ from imagefactory.imagefactory import create_image
               help='Text that is written in the image.')
 @click.option('--savedir', '-d', default='',
               help='Directory where image should be saved.')
-def main(name, width, height, filetype, text, savedir):
+@click.option('--overwrite', is_flag=True,
+              help='If image exists in the file system overwrites it.')
+def main(name, width, height, filetype, text, savedir, overwrite):
     """Console script for imagefactory"""
-    create_image(name, width, height, filetype, text, savedir)
+    create_image(name, filetype, width, height, text, savedir, overwrite)
 
 
 if __name__ == "__main__":

@@ -46,15 +46,15 @@ def _create_svg(name, width, height, text):
     center = (width / 2, height / 2)
     image = svgwrite.Drawing(file.name, profile='tiny', height=height,
                              width=width)
-    image.add(image.rect(insert=(0, 0), size=(width, height)))
+    image.add(image.rect(insert=(0, 0), size=(width, height), fill='gray'))
     # TODO: Test if text fits inside rectangle
-    image.add(image.text(text, insert=center))
+    # image.add(image.text(text, insert=center))
     image.write(file)
     file.seek(0)
     return file
 
 
-def _save_image(image, filedir):
+def _save_image(image, filedir, overwrite):
     """
     Save in memory image to a file.
 
@@ -77,7 +77,7 @@ def _save_image(image, filedir):
         mode = 'wb'
 
     filepath = os.path.join(filedir, image.name)
-    if os.path.exists(filepath):
+    if os.path.exists(filepath) and not overwrite:
         raise FileExistsError(
             'File with name "{name}" already exists in path "{filepath}".'
             ''.format(name=image.name, filepath=filepath)
@@ -86,15 +86,26 @@ def _save_image(image, filedir):
         shutil.copyfileobj(image, file)
 
 
-def create_image(name='untitled', width=48, height=48, filetype='png',
-                 text=None, savedir=None):
+def create_image(name='untitled', filetype='png', width=48, height=48,
+                 text=None, savedir=None, overwrite=False):
     """
-    Creates in memory images for testing.
+    Creates in memory images for testing [#]_. Bitmap images are created
+
+    >>> from imagefactory import create_image
+    >>> create_image()
+    <_io.BytesIO object at ...>
+
+    Vector graphic images can be created
+
+    >>> from imagefactory import create_image
+    >>> create_image(filetype='svg')
+    <_io.StringIO object at ...>
 
     Args:
         name (str):
-            Name of the file. If extension is supplied it overwrites any
-            supplied filetype.
+            - ``name`` Name of the file.
+            - ``name.ext`` If extension is supplied it overwrites any supplied
+              filetype.
 
         width (int):
             Positive integer
@@ -103,26 +114,28 @@ def create_image(name='untitled', width=48, height=48, filetype='png',
             Positive integer
 
         filetype (str):
-            Bitmap {'jpeg', 'png', 'gif'}. Vector graphics {'svg'}
+            Filetype is extension string: ``jpeg, png, gif, svg``
 
         text (str, optional):
-            None uses default "{width}x{height}" string. Otherwise supplied
-            string is used if string is empty no text is set.
+            - Default:  ``None`` uses ``{width}x{height}``
+            - Otherwise supplied ``text`` string is used.
 
         savedir (str, optional):
-            Directory for saving created image. Default value is None which
-            doesn't save the image.
+            - Default: ``None`` doesn't save the image
+            - Otherwise save image to ``savedir`` directory
+
+        overwrite (Boolean):
+            Boolean flag for toggling if existing file in the same filepath
+            should be overwritten.
 
     Returns:
         BytesIO|StringIO:
-            Image as BytesIO or StringIO object. It can be used in same fashion
+            Image as ``BytesIO`` or ``StringIO`` object. It can be used in same fashion
             as file object created by opening a file.
 
-    Resources:
-    .. [#] http://wildfish.com/blog/2014/02/27/generating-in-memory-image-for-
-           tests-python/
-    .. [#] https://pillow.readthedocs.io/en/latest/
-    .. [#] https://svgwrite.readthedocs.io/en/latest/overview.html
+    References:
+
+        .. [#] http://wildfish.com/blog/2014/02/27/generating-in-memory-image-for-tests-python/
     """
     logging.info("")
     name, ext = os.path.splitext(name)
@@ -144,6 +157,6 @@ def create_image(name='untitled', width=48, height=48, filetype='png',
         image = _create_bitmap(name, width, height, filetype, text)
 
     if savedir is not None:
-        _save_image(image, savedir)
+        _save_image(image, savedir, overwrite)
 
     return image
