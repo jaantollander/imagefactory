@@ -25,11 +25,22 @@ memory images or saved in to the filesystem.
 
 Examples
 --------
-Bitmap
+Jpeg
+.. image:: docs/images/untitled.jpeg
+   :target: docs/images/untitled.jpeg
+   :alt: example.jpeg
 
+Png
 
+.. image:: docs/images/untitled.png
+   :target: docs/images/untitled.png
+   :alt: example png
 
 Svg
+
+.. image:: docs/images/untitled.svg
+   :target: docs/images/untitled.svg
+   :alt: example svg
 
 
 Credits
