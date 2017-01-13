@@ -26,13 +26,13 @@ script: tox -e ${TOXENV}
 # travis_pypi_setup.py script to finish PyPI deployment setup
 # TODO: make docs and push to gh-pages
 
-#deploy:
-#  provider: pypi
-#  distributions: sdist bdist_wheel
-#  user: jaantollander
-#  password:
-#    secure: PLEASE_REPLACE_ME
-#  on:
-#    tags: true
-#    repo: jaantollander/imagefactory
-#    condition: $TOXENV == py35
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: jaantollander
+  password:
+    secure: A/Yhr21qS9G+bv/yKDl2JwqwKoy7W6MPTR/3wt0YNUmuws97dA8QZnwea6TY+ob3k1XXrXtj0CBjagBmzW29Nuh5YQizxpHh6NJksra1SNE4LqDtgDeLRDfktdfgMfEG0ivDaUeOwG+1EhRUt0Jwd/yKPCHWyMEZVCk7wXxGxcS5Y2hGvQDd+NpmsQXJ25I93eNysODlBSPXbfPGg6Mq0j8k6chbnFgAnUssZda/e/PA9GGWzjG42mbnTfQ2QJy7CaaygmH3fZVJYOFgD6OdyNgzAufuwwTfT2EH9ppCJ7Bgl+VMpKHbYxdYI1nLRXMTdyHaRoKbjqp4jitAJldHM8hiC05P8SnxxGXd/Fw/QASdvx3GDwZt6Ec2C3WMoE46Chu3ZyALUsBrvK5yonC+UiyLLWtQL9joq6619mBQJsHJyUoVyMzsxaZMLe9b9vZyZjCFOZJoDYxD9JQHQUx/qyHfug5jNC9HuLpZZ6+R6oXQ2DQCyK8FyrkUyrDr3Eg/DRXysm5s7bRjy3bnD3+b/SNMrbXPTZCIXvDfVVgD7vobG4FtvOt3ujJj0QEz20enfkXDhDfVxQFqy09Yz24JNvkaWQ3+XSVIaYK0KfNQeYrBlAM4WqTijLcofgrwl4Lx4xn1/hrmMtw4EqPI1+I4JzElwVTAlehrMW0EzePAiwM=
+  on:
+    tags: true
+    repo: jaantollander/imagefactory
+    condition: $TOXENV == py35
