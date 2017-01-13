@@ -9,13 +9,21 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
+
 requirements = [
-    'Click>=6.0',
-    # TODO: put package requirements here
+    'click',
+    'Pillow',
 ]
 
+extras_require = {
+    'SVG': ['svgwrite']
+}
+
 test_requirements = [
-    # TODO: put package test requirements here
+    'pytest',
+    'coverage',
+    'pytest-cov',
+    'hypothesis',
 ]
 
 setup(
@@ -38,6 +46,7 @@ setup(
     },
     include_package_data=True,
     install_requires=requirements,
+    extras_require=extras_require,
     license="MIT license",
     zip_safe=False,
     keywords='imagefactory',
